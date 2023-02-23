@@ -94,6 +94,58 @@ https://templatemo.com/tm-579-cyborg-gaming
                   document here</h4>
                   <div class="main-button">
                     <a href="upload.html">Upload here</a>
+                    <script>
+		// Create IPFS instance
+		async function setupIPFS() {
+			const ipfs = await IPFS.create({
+				config: {
+					Addresses: {
+						Swarm: [
+							'/ip4/0.0.0.0/tcp/4002',
+							'/ip4/127.0.0.1/tcp/4003/ws',
+						]
+					}
+				}
+			});
+
+			// Display images in the gallery
+			ipfsImg("#images", {
+				ipfs: ipfs,
+				files: [
+					{ path: "Qmabcdefg123456", alt: "Image 1" },
+					{ path: "Qmhijklm789012", alt: "Image 2" },
+					{ path: "Qmnopqrs345678", alt: "Image 3" }
+				]
+			});
+
+			// Handle form submission
+			document.querySelector("form").addEventListener("submit", async (event) => {
+				event.preventDefault();
+
+				// Get the uploaded image
+				const image = document.querySelector("#image").files[0];
+				if (!image) {
+					return;
+				}
+
+				// Add the image to IPFS
+				const added = await ipfs.add(image);
+				const hash = added.cid.string;
+
+				// Display the new image in the gallery
+				const gallery = document.querySelector("#images");
+				const img = document.createElement("img");
+				img.src = `ipfs/${hash}`;
+				img.alt = `Image ${gallery.children.length + 1}`;
+				gallery.appendChild(img);
+			});
+		}
+
+		// Call the setupIPFS function
+		setupIPFS().catch((error) => {
+			console.error(error);
+		});
+	</script>
                   </div>
                 </div>
               </div>
